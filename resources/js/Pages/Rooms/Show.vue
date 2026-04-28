@@ -119,6 +119,22 @@ const redo = async () => {
     }
 };
 
+// Polyfill UUID generator - hoạt động trên cả HTTP và HTTPS
+const generateUUID = () => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    // Fallback: dùng crypto.getRandomValues nếu có, hoặc Math.random
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r =
+            typeof crypto !== 'undefined' && crypto.getRandomValues
+                ? (crypto.getRandomValues(new Uint8Array(1))[0] & 15) >> (c === 'x' ? 0 : 1)
+                : (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+};
+
 const copyInviteLink = () => {
     navigator.clipboard.writeText(props.room.id);
     copyStatus.value = '✅ Đã copy mã ID!';
@@ -130,7 +146,7 @@ const copyInviteLink = () => {
 const handleMouseDown = (e) => {
     isDrawing.value = true;
     const pos = e.target.getStage().getPointerPosition();
-    const id = crypto.randomUUID();
+    const id = generateUUID();
     currentId.value = id;
 
     let newObject = {
