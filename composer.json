@@ -50,6 +50,9 @@
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
         ],
+        "reverb:ram": [
+            "powershell -NoProfile -Command \"$port = if ($env:REVERB_SERVER_PORT) { [int]$env:REVERB_SERVER_PORT } elseif ($env:REVERB_PORT) { [int]$env:REVERB_PORT } else { 8080 }; $procId = (Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction Stop | Select-Object -First 1 -ExpandProperty OwningProcess); Get-Process -Id $procId | Select-Object Id, ProcessName, @{Name='RAM_MB';Expression={[math]::Round($_.WorkingSet64 / 1MB, 2)}}\""
+        ],
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
